@@ -1,0 +1,70 @@
+{
+	"name": "@bylocico/testcontainers-rustfs",
+	"version": "1.0.0-beta.1",
+	"description": "Testcontainers wrapper for RustFS — an S3-compatible object store written in Rust.",
+	"keywords": [
+		"testcontainers",
+		"rustfs",
+		"s3",
+		"minio",
+		"object-storage",
+		"testing"
+	],
+	"license": "MIT",
+	"author": "By Loci",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bylocico/testcontainers-rustfs.git"
+	},
+	"homepage": "https://github.com/bylocico/testcontainers-rustfs#readme",
+	"bugs": {
+		"url": "https://github.com/bylocico/testcontainers-rustfs/issues"
+	},
+	"packageManager": "npm@10.9.8",
+	"engines": {
+		"node": ">=18",
+		"npm": ">=10.0.0 <11.0.0"
+	},
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"src",
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"clean": "rimraf dist",
+		"prepack": "npm run clean && npm run build",
+		"npm10": "node ./node_modules/npm/bin/npm-cli.js",
+		"test": "node --import tsx --test \"test/**/*.test.ts\"",
+		"typecheck": "tsc --noEmit -p tsconfig.json"
+	},
+	"peerDependencies": {
+		"@aws-sdk/client-s3": ">=3"
+	},
+	"peerDependenciesMeta": {
+		"@aws-sdk/client-s3": {
+			"optional": false
+		}
+	},
+	"dependencies": {
+		"testcontainers": "^11.8.0"
+	},
+	"devDependencies": {
+		"npm": "10.9.8",
+		"@aws-sdk/client-s3": "^3.1037.0",
+		"@types/node": "^24.10.1",
+		"rimraf": "^6.1.0",
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3"
+	}
+}

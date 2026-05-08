@@ -1,0 +1,41 @@
+name: Publish Package
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      # Trusted publishing (OIDC) requires npm CLI >= 11.5.1 and Node >= 22.14.0.
+      # Do not use Corepack / npm 10 here — local dev may still use packageManager in package.json.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+
+      # npm 11+ requires --tag for prerelease versions (e.g. 1.0.0-beta.1).
+      - id: dist-tag
+        run: |
+          TAG=$(node -e "const v=require('./package.json').version; const i=v.indexOf('-'); process.stdout.write(i<0?'latest':v.slice(i+1).split('.')[0]);")
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      # Auth: GitHub OIDC trusted publisher (no NPM_TOKEN). Provenance is added automatically.
+      - run: npm publish --access public --tag ${{ steps.dist-tag.outputs.tag }}

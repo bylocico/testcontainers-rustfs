@@ -1,0 +1,115 @@
+name: Update RustFS Target
+
+on:
+  schedule:
+    - cron: "21 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  discover:
+    name: Discover new RustFS tags
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      versions: ${{ steps.discover.outputs.versions }}
+      latest: ${{ steps.discover.outputs.latest }}
+      has_updates: ${{ steps.discover.outputs.has_updates }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - run: npm ci
+
+      - id: discover
+        shell: bash
+        run: |
+          versions="$(node scripts/update-rustfs-version.mjs --list-newer)"
+          latest="$(node -e 'const versions = JSON.parse(process.argv[1]); console.log(versions.at(-1) ?? "")' "$versions")"
+          {
+            echo "versions=$versions"
+            echo "latest=$latest"
+            if [ "$versions" = "[]" ]; then
+              echo "has_updates=false"
+            else
+              echo "has_updates=true"
+            fi
+          } >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test RustFS ${{ matrix.rustfs_version }}
+    needs: discover
+    if: needs.discover.outputs.has_updates == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        rustfs_version: ${{ fromJson(needs.discover.outputs.versions) }}
+    env:
+      RUSTFS_IMAGE: rustfs/rustfs:${{ matrix.rustfs_version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - run: npm ci
+      - run: node scripts/update-rustfs-version.mjs --version "${{ matrix.rustfs_version }}"
+      - run: npm install --package-lock-only
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      - run: npm pack --dry-run
+
+  pull-request:
+    name: Open update PR
+    needs:
+      - discover
+      - test
+    if: always() && needs.discover.outputs.has_updates == 'true' && needs.test.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - run: npm ci
+      - run: node scripts/update-rustfs-version.mjs --version "${{ needs.discover.outputs.latest }}"
+      - run: npm install --package-lock-only
+
+      - id: create-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-rustfs-${{ needs.discover.outputs.latest }}
+          delete-branch: true
+          title: "chore: target RustFS ${{ needs.discover.outputs.latest }}"
+          commit-message: "chore: target RustFS ${{ needs.discover.outputs.latest }}"
+          body: |
+            Updates the default RustFS image target to `rustfs/rustfs:${{ needs.discover.outputs.latest }}`.
+
+            The updater tested every newly discovered version before opening this PR:
+
+            ```json
+            ${{ needs.discover.outputs.versions }}
+            ```
+
+      - name: Enable auto-merge
+        if: steps.create-pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr merge "${{ steps.create-pr.outputs.pull-request-number }}" --auto --squash
+        continue-on-error: true
