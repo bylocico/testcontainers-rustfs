@@ -92,7 +92,7 @@ jobs:
       - run: npm install --package-lock-only
 
       - id: create-pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/update-rustfs-${{ needs.discover.outputs.latest }}
           delete-branch: true
