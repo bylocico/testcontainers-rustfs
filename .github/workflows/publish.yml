@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Trusted publishing (OIDC) requires npm CLI >= 11.5.1 and Node >= 22.14.0.
       # Do not use Corepack / npm 10 here — local dev may still use packageManager in package.json.
