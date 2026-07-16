@@ -22,6 +22,7 @@ export class RustfsContainer extends GenericContainer {
 			.withEnvironment({
 				RUSTFS_ROOT_USER: this.rootUser,
 				RUSTFS_ROOT_PASSWORD: this.rootPassword,
+				RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS: 'true',
 			})
 			.withWaitStrategy(
 				Wait.forHttp('/', API_PORT).forStatusCodeMatching((c) => c < 500),
