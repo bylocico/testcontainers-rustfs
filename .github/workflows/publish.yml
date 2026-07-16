@@ -20,7 +20,7 @@ jobs:
 
       # Trusted publishing (OIDC) requires npm CLI >= 11.5.1 and Node >= 22.14.0.
       # Do not use Corepack / npm 10 here — local dev may still use packageManager in package.json.
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org
