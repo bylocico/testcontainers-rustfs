@@ -6,7 +6,7 @@ import {
 	Wait,
 } from 'testcontainers'
 
-export const DEFAULT_RUSTFS_VERSION = '1.0.0-beta.10-preview.5'
+export const DEFAULT_RUSTFS_VERSION = '1.0.0-beta.11-preview.1'
 export const DEFAULT_IMAGE = `rustfs/rustfs:${DEFAULT_RUSTFS_VERSION}`
 export const DEFAULT_USER = 'rustfsadmin'
 export const DEFAULT_PASSWORD = 'rustfsadmin'
