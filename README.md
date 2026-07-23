@@ -8,10 +8,10 @@ The package is intentionally dependency-light and shaped like the official Testc
 
 The npm package version tracks the RustFS Docker image version it targets.
 
-For example, `@bylocico/testcontainers-rustfs@1.0.0-beta.10-preview.5` defaults to:
+For example, `@bylocico/testcontainers-rustfs@1.0.0-beta.11-preview.1` defaults to:
 
 ```text
-rustfs/rustfs:1.0.0-beta.10-preview.5
+rustfs/rustfs:1.0.0-beta.11-preview.1
 ```
 
 Wrapper-only changes should be kept small and released with the next RustFS target version where practical. If an urgent wrapper fix is needed before RustFS moves, publish a patch version and document the exception in the release notes.
@@ -21,7 +21,7 @@ CI runs automatically on pull requests and pushes. The update workflow also quer
 Consumers can still pull any valid RustFS image version without waiting for this package to retarget:
 
 ```ts
-await new RustfsContainer('rustfs/rustfs:1.0.0-beta.10-preview.5').start()
+await new RustfsContainer('rustfs/rustfs:1.0.0-beta.11-preview.1').start()
 await new RustfsContainer('rustfs/rustfs:latest').start()
 ```
 
@@ -80,7 +80,7 @@ Pass an explicit image to test a different RustFS release:
 
 ```ts
 new RustfsContainer('rustfs/rustfs:latest')
-new RustfsContainer('rustfs/rustfs:1.0.0-beta.10-preview.5')
+new RustfsContainer('rustfs/rustfs:1.0.0-beta.11-preview.1')
 ```
 
 ### `.withCredentials(user, password)`
@@ -166,7 +166,7 @@ node scripts/update-rustfs-version.mjs --list-newer
 Retarget the package to a specific RustFS version:
 
 ```bash
-node scripts/update-rustfs-version.mjs --version 1.0.0-beta.10-preview.5
+node scripts/update-rustfs-version.mjs --version 1.0.0-beta.11-preview.1
 npm install --package-lock-only
 ```
 
@@ -196,7 +196,7 @@ The workflow sets `permissions: id-token: write` so Actions can mint the OIDC to
 
 **Provenance:** when publishing from a **public** repo via trusted publishing, npm attaches [provenance](https://docs.npmjs.com/generating-provenance-statements) automatically; the workflow does not pass `--provenance` explicitly.
 
-**Prereleases:** versions like `1.0.0-beta.10-preview.5` are published with an explicit **dist-tag** (for example `beta`), not only `latest`. Consumers install them with:
+**Prereleases:** versions like `1.0.0-beta.11-preview.1` are published with an explicit **dist-tag** (for example `beta`), not only `latest`. Consumers install them with:
 
 ```bash
 npm install --save-dev @bylocico/testcontainers-rustfs@beta
@@ -207,14 +207,14 @@ npm install --save-dev @bylocico/testcontainers-rustfs@beta
 1. Confirm the target RustFS Docker tag exists:
 
    ```bash
-   docker manifest inspect rustfs/rustfs:1.0.0-beta.10-preview.5
+   docker manifest inspect rustfs/rustfs:1.0.0-beta.11-preview.1
    ```
 
 2. Update `package.json` and `DEFAULT_RUSTFS_VERSION` to the same version.
 3. Run `npm install` so `package-lock.json` records the new package version.
 4. Run `npm run typecheck && npm run build && npm test && npm pack --dry-run`.
 5. Push to `main`.
-6. Create a GitHub **Release** (publish event) for that version, for example tag `v1.0.0-beta.10-preview.5`, or run the workflow manually from the Actions tab.
+6. Create a GitHub **Release** (publish event) for that version, for example tag `v1.0.0-beta.11-preview.1`, or run the workflow manually from the Actions tab.
 
 ### Manual publish (maintainers)
 
