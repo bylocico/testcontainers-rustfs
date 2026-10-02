@@ -1,6 +1,6 @@
 {
 	"name": "@bylocico/testcontainers-rustfs",
-	"version": "1.0.1-preview.14",
+	"version": "1.0.1-preview.16",
 	"description": "Testcontainers wrapper for RustFS — an S3-compatible object store written in Rust.",
 	"keywords": [
 		"testcontainers",
